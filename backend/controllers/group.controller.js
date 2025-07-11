@@ -1,7 +1,8 @@
 import Group from "../models/group.model.js";
 import GroupMessage from "../models/group.message.model.js";
-import { io } from "../socket/socket.js";
+import { getReceiverSocketId, io } from "../socket/socket.js";
 import User from "../models/user.model.js";
+import groupModel from "../models/group.model.js";
 
 // Create a new group
 export const createGroup = async (req, res) => {
@@ -39,7 +40,7 @@ export const sendGroupMessage = async (req, res) => {
   try {
     const { text, img } = req.body;
     const { groupId } = req.params;
-    const senderId = req.user._id;
+    const {_id :senderId, profileImg, fullname, username} = req.user;
 
     const group = await Group.findById(groupId);
 
@@ -57,17 +58,52 @@ export const sendGroupMessage = async (req, res) => {
     group.messages.push(newMessage._id);
     await group.save();
 
+    const newMessageV = {
+      senderId : {
+        _id : senderId,
+        profileImg,
+        fullname,
+        username
+      },
+      _id: newMessage._id,
+      groupId : newMessage.groupId,
+      text : newMessage.text,
+      img : newMessage.img,
+      createdAt: newMessage.createdAt
+    }
+
     // Broadcast the message to all members in the group
     group.members.forEach((memberId) => {
       const receiverSocketId = getReceiverSocketId(memberId);
       if (receiverSocketId) {
-        io.to(receiverSocketId).emit("newGroupMessage", newMessage);
+        io.to(receiverSocketId).emit("newGroupMessage", newMessageV);
       }
     });
 
     res.status(201).json(newMessage);
   } catch (error) {
+    console.log(error);
     res.status(500).json({ error: "Failed to send message" });
+  }
+};
+
+export const getGroupMessages = async (req, res) => {
+  try {
+    const { groupId } = req.params;
+    const group = await Group.findById(groupId).populate({
+      path: "messages",
+      select: "text senderId createdAt",
+      populate: {
+        path: "senderId",
+        select: "profileImg username fullname",
+      },
+    });
+
+    if (!group) return res.status(404).json({ error: "Group not found" });
+
+    res.status(200).json(group.messages);
+  } catch (error) {
+    res.status(500).json({ error: "Internal server error" });
   }
 };
 
@@ -89,31 +125,32 @@ export const deleteGroup = async (req, res) => {
   }
 };
 
-export const getGroupMessages = async (req, res) => {
+export const getUserGroups = async (req, res) => {
   try {
-    const { groupId } = req.params; // Get the group ID from the request parameters
-    const group = await Group.findById(groupId).populate("messages"); // Find the group and populate messages
+    const userId = req.user._id;
+    const groups = await Group.find({
+      $or: [{ members: userId }, { createdBy: userId }],
+    })
+      .populate("members", "name profileImg")
+      .populate("createdBy", "name profileImg");
 
-    if (!group) return res.status(404).json({ error: "Group not found" }); // Return an error if the group doesn't exist
-
-    // Get the messages from the group
-    res.status(200).json(group); // Return the messages
+    res.status(200).json(groups); // Return the groups
   } catch (error) {
     res.status(500).json({ error: "Internal server error" }); // Handle any errors
   }
 };
 
-export const getUserGroups = async (req, res) => {
+export const getGroupById = async (req, res) => {
   try {
-    const userId = req.user._id; // Get the user ID from the request
-    const groups = await Group.find({
-      $or: [{ members: userId }, { createdBy: userId }],
-    }) // Find groups where the user is a member
-      .populate("members", "name profileImg") // Populate member details
-      .populate("createdBy", "name profileImg"); // Populate creator details
+    const { groupId } = req.params;
+    const group = await groupModel.findById(groupId).select("-messages");
 
-    res.status(200).json(groups); // Return the groups
+    if (!group) {
+      return res.status(404).json({ error: "Group not found" });
+    }
+
+    res.status(200).json(group);
   } catch (error) {
-    res.status(500).json({ error: "Internal server error" }); // Handle any errors
+    res.status(500).json({ error: "Internal server error" });
   }
 };

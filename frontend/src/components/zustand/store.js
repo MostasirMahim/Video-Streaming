@@ -15,6 +15,7 @@ const usersStore = create((set) => ({
     set((state) => ({
       conversations: [...state.conversations, newMessage],
     })),
+  clearConversations: () => set({ conversations: [] }),
 }));
 
 export default usersStore;

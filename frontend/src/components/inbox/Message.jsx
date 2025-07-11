@@ -6,9 +6,13 @@ import { extractTime } from "../utils/dateModify";
 function Message({ message }) {
   const { user } = usersStore();
   const { data: authUser } = useQuery({ queryKey: ["authUser"] });
-  const fromMe = message.receiverId === user._id;
+ const fromMe =
+  (typeof message?.senderId === "object"
+    ? message?.senderId?._id
+    : message?.senderId) === authUser?._id;
+  console.log(fromMe);
   const chatClassName = fromMe ? "chat-end" : "chat-start";
-  const profilePic = fromMe ? authUser.profileImg : user?.profileImg;
+  const profilePic = fromMe ? authUser?.profileImg : (user?.profileImg || message?.senderId?.profileImg);
   const messageTime = extractTime(message.createdAt);
 
   function getDownloadLink(cloudinaryUrl) {
@@ -34,7 +38,7 @@ function Message({ message }) {
     <div className={`chat ${chatClassName}  w-full h-full`}>
       <div className="chat-image avatar">
         <div className="w-10 rounded-full">
-          <img src={profilePic} alt="" />
+          <img src={profilePic || message?.senderId?.profileImg} alt="" />
         </div>
       </div>
       {message.text && message.img ? (

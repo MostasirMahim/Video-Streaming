@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
+import ConverHeader from "../conversation/ConverHeader";
 
 function GroupPage() {
   const navigate = useNavigate();
@@ -8,7 +9,7 @@ function GroupPage() {
     queryFn: async () => {
       try {
         const res = await fetch("/api/groups/");
-        const data = res.json();
+        const data = await res.json();
         if (!res.ok) throw new Error(data.error);
         return data;
       } catch (error) {
@@ -23,6 +24,8 @@ function GroupPage() {
   }
 
   return (
+    <div>
+      <ConverHeader />
     <div className="w-full h-full flex flex-col items-start justify-start">
       {group && group.length > 0 ? (
         <div className="flex flex-col items-center justify-center w-full">
@@ -60,6 +63,7 @@ function GroupPage() {
       ) : (
         <div className="text-center text-white">No groups found</div>
       )}
+    </div>
     </div>
   );
 }
