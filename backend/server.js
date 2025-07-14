@@ -34,6 +34,7 @@ app.get("*", (req, res) => {
 });
 
 server.listen(PORT, () => {
+  console.log("Volume Test is ok");
   console.log(`server is running on ${PORT}`);
   connectMongoDb();
 });
