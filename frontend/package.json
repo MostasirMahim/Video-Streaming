@@ -11,10 +11,13 @@
   },
   "dependencies": {
     "@emoji-mart/react": "^1.1.1",
+    "@livekit/components-react": "^2.9.14",
+    "@livekit/components-styles": "^1.1.6",
     "@tanstack/react-query": "^5.56.2",
     "@tanstack/react-query-devtools": "^5.58.0",
     "alpinejs": "^3.14.1",
     "backend": "file:..",
+    "livekit-client": "^2.15.7",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-hot-toast": "^2.4.1",

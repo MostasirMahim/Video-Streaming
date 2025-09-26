@@ -2,7 +2,7 @@ import { SlOptionsVertical } from "react-icons/sl";
 import { MdOutlineEmojiEmotions } from "react-icons/md";
 import { MdOutlineKeyboardBackspace } from "react-icons/md";
 import { IoMdAdd } from "react-icons/io";
-import { IoSendSharp } from "react-icons/io5";
+import { IoCall, IoCallSharp, IoSendSharp } from "react-icons/io5";
 import Message from "./Message";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useEffect, useRef, useState } from "react";
@@ -23,7 +23,7 @@ function MessageInbox() {
   const addConversation = usersStore((state) => state.addConversation);
   const isOnline = onlineUsers.includes(user._id);
   const navigate = useNavigate();
-
+const { data: authUser} = useQuery({queryKey: ["authUser"]})
   useEffect(() => {
     if (user._id === null) {
       navigate("/chats");
@@ -175,8 +175,10 @@ function MessageInbox() {
             </div>
           </div>
         </div>
-
-        <div className="pr-4">
+            
+        <div className="pr-4 flex gap-2 items-center">
+          <IoCallSharp onClick={() => navigate(`/rooms?room=${user?._id}+${authUser?._id}`)} className=" cursor-pointer hover:scale-110 hover:text-sky-400" />
+          <IoCall onClick={() => navigate(`/rooms?room=${authUser?._id}+${user?._id}`)} className=" cursor-pointer hover:scale-110 hover:text-sky-400" />
           <SlOptionsVertical className=" cursor-pointer hover:scale-110 hover:text-sky-400" />
         </div>
       </div>

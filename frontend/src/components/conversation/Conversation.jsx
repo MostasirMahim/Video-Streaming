@@ -6,6 +6,7 @@ import LeftSidebar from "../pages/LeftSidebar";
 import leftbarVisibility from "../zustand/leftbarVisibility";
 import mIcon from "../../assets/buble.png";
 import GroupPage from "../pages/GroupPage";
+import Room from "../calls/Room";
 
 function Conversation() {
   const { box } = useParams();
@@ -31,6 +32,7 @@ function Conversation() {
         {box == "chats" && <ChatBox />}
         {box == "settings" && <SettingBox />}
         {box == "groups" && <GroupPage />}
+        {box == "rooms" && <Room />}
       </div>
       <div
         className={`bg-[#222E35] ${

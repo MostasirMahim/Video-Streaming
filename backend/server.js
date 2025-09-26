@@ -9,6 +9,7 @@ import { app, server } from "./socket/socket.js";
 import { v2 as cloudinary } from "cloudinary";
 import path from "path";
 import groupsRoutes from './routes/group.routes.js'
+import callRoutes from './routes/call.routes.js'
 
 dotenv.config();
 const PORT = process.env.PORT || 5000;
@@ -23,15 +24,15 @@ cloudinary.config({
   api_secret: process.env.API_SECRET,
 });
 
+
 app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/messages", conversationRoutes);
 app.use("/api/groups", groupsRoutes);
+app.use("/api/call", callRoutes);
 
-app.use(express.static(path.join(__dirname, "/frontend/dist")));
-app.get("*", (req, res) => {
-  res.sendFile(path.join(__dirname, "frontend", "dist", "index.html"));
-});
+
+
 
 server.listen(PORT, () => {
   console.log("Volume Test is ok");
