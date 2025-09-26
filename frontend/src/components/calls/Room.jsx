@@ -13,10 +13,8 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 
 export default function Page() {
   const navigate = useNavigate();
-const [searchParams] = useSearchParams();
-const room = searchParams.get("room");
-  console.log("Room:", room);
-
+  const [searchParams] = useSearchParams();
+  const room = searchParams.get("room");
   const { data: token, isLoading } = useQuery({
     queryKey: ["callToken", room],
     queryFn: async () => {
@@ -33,7 +31,6 @@ const room = searchParams.get("room");
     },
   });
   const URL = `wss://mahimvideostream-8q7jmrti.livekit.cloud`;
-console.log("Token:", token);
   return (
     <>
       {token ? (
@@ -43,16 +40,11 @@ console.log("Token:", token);
           token={token}
           serverUrl={URL}
           onDisconnected={() => navigate(-1)}
-          // Use the default LiveKit theme for nice styles.
           data-lk-theme="default"
           style={{ height: "100dvh" }}
         >
-          {/* Your custom component with basic video conferencing functionality. */}
           <MyVideoConference />
-          {/* The RoomAudioRenderer takes care of room-wide audio for you. */}
           <RoomAudioRenderer />
-          {/* Controls for the user to start/stop audio, video, and screen 
-      share tracks and to leave the room. */}
           <ControlBar />
         </LiveKitRoom>
       ) : (
@@ -66,8 +58,6 @@ console.log("Token:", token);
 }
 
 function MyVideoConference() {
-  // `useTracks` returns all camera and screen share tracks. If a user
-  // joins without a published camera track, a placeholder track is returned.
   const tracks = useTracks(
     [
       { source: Track.Source.Camera, withPlaceholder: true },
@@ -80,8 +70,6 @@ function MyVideoConference() {
       tracks={tracks}
       style={{ height: "calc(100vh - var(--lk-control-bar-height))" }}
     >
-      {/* The GridLayout accepts zero or one child. The child is used
-      as a template to render all passed in tracks. */}
       <ParticipantTile />
     </GridLayout>
   );
