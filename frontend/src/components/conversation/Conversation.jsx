@@ -12,7 +12,6 @@ function Conversation() {
   const { box } = useParams();
   const hasOutlet = useOutlet();
   const { leftbarVisible } = leftbarVisibility();
-  console.log(box);
 
   return (
     <div className="flex justify-start w-full h-screen max-h-screen">
