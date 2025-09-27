@@ -26,10 +26,7 @@ function App() {
 
   const {pathname} = useLocation();
   const box = pathname.split('/')[1];
-  console.log("Box:", box);
-  console.log("Current Path:", pathname);
 
-  
   if(isLoading) {
     return <LoadingSpinner />
   }
